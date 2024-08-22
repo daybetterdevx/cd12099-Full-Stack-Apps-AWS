@@ -1,6 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { filterImageFromURL, deleteLocalFiles } from "./util/util.js";
+import {
+  filterImageFromURL,
+  deleteLocalFiles,
+  processImage,
+} from "./util/util.js";
 
 // Init the Express application
 const app = express();
@@ -41,12 +45,11 @@ app.get("/filteredimage", async (req, res) => {
 
   try {
     const filteredImagePath = await filterImageFromURL(image_url);
-
+    const processImagePath = await processImage(filteredImagePath);
     // Send the filtered image file in the response
-    res.sendFile(filteredImagePath, {}, async (err) => {
+    res.sendFile(processImagePath, {}, async (err) => {
       if (err) return res.status(400).send("Bad request, please try again");
-
-      await deleteLocalFiles([filteredImagePath]);
+      await deleteLocalFiles([processImagePath]);
     });
   } catch (error) {
     console.log(error);
